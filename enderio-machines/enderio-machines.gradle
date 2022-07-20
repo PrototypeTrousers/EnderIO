@@ -1,5 +1,6 @@
 dependencies {
 	compile project(":enderio-base")
-	
-	compile "com.feed_the_beast.mods:FTBLib:${ftbl_version}"
+
+	compile "ftb-library-legacy-forge:FTBLib:${ftbl_version}"
+
 }

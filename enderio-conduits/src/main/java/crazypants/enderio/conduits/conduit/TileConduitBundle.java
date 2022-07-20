@@ -112,6 +112,7 @@ public class TileConduitBundle extends TileEntityEio implements IConduitBundle, 
   private @Nullable FacadeRenderState facadeRenderAs;
 
   private @Nonnull ConduitDisplayMode lastMode = ConduitDisplayMode.ALL;
+  private int isRendering = 0;
 
   public TileConduitBundle() {
     this.blockType = ConduitRegistry.getConduitModObjectNN().getBlockNN();
@@ -347,7 +348,11 @@ public class TileConduitBundle extends TileEntityEio implements IConduitBundle, 
     // client side only, check for changes in rendering of the bundle
     if (world.isRemote) {
       Prof.next(getWorld(), "clientTick");
-      updateEntityClient();
+      if (isRendering > 0)
+      {
+        updateEntityClient();
+        isRendering--;
+      }
     }
 
     Prof.stop(getWorld());
@@ -363,7 +368,7 @@ public class TileConduitBundle extends TileEntityEio implements IConduitBundle, 
 
   private void updateEntityClient() {
     boolean markForUpdate = false;
-    if (clientUpdated) {
+    if (isRendering != 1 || clientUpdated) {
       // TODO: This is not the correct solution here but just marking the block for a render update server side
       // seems to get out of sync with the client sometimes so connections are not rendered correctly
       markForUpdate = true;
@@ -393,7 +398,7 @@ public class TileConduitBundle extends TileEntityEio implements IConduitBundle, 
     }
     lastMode = curMode;
 
-    if (markForUpdate) {
+    if (isRendering != 1 || markForUpdate) {
       updateBlock();
     }
   }
@@ -849,4 +854,13 @@ public class TileConduitBundle extends TileEntityEio implements IConduitBundle, 
     return result;
   }
 
+  public void isRendering()
+  {
+    if (isRendering == 0)
+    {
+      isRendering = 2;
+    } else {
+      isRendering = 1;
+    }
+  }
 }
